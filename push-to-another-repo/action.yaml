@@ -1,0 +1,57 @@
+name: Push to another repo
+description: Push file/directory to another repository using Access Key
+inputs:
+  source:
+    description: File or directory to be pushed
+    required: true
+  access_key:
+    description: Access credentials for reading & pushing to the destination repository
+    required: true
+  destination_repo_name:
+    description: Git repository to push the changes to including the owner user name
+    required: true
+  destination_directory:
+    description: Directory in destination repository to push the changes to
+    required: false
+    default: "."
+  destination_branch:
+    description: Branch in destination repository to puch the changes to
+    required: false
+    default: "push-from-${{ github.repository }}"
+  delete_destination_content:
+    description: Delete destination directory contents before push?
+    required: false
+    default: "false"
+  commit_message:
+    description: Commit message for changes to be pushed in destination repository
+    required: false
+    default: "${{ github.job }} job pushed changes from https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
+  user_name:
+    description: User name for commit author
+    required: false
+    default: ${{ github.actor }}
+  user_email:
+    description: User email for commit author
+    required: false
+    default: "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+  server:
+    description: Host server of the destination repository
+    required: false
+    default: "github.com"
+outputs:
+  commit_hash:
+    description: The SHA hash of the generated commit
+runs:
+  using: docker
+  image: Dockerfile
+  args:
+    - ${{ inputs.source }}
+    - ${{ inputs.access_key }}
+    - ${{ inputs.destination_repo_name }}
+    - ${{ inputs.destination_directory }}
+    - ${{ inputs.destination_branch }}
+    - ${{ inputs.delete_destination_content }}
+    - ${{ inputs.commit_message }}
+    - ${{ inputs.user_name }}
+    - ${{ inputs.user_email }}
+    - ${{ inputs.server }}
