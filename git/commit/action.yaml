@@ -1,0 +1,24 @@
+name: "Commit changes"
+description: "Commit changes to the repository"
+
+inputs:
+  commit_message:
+    description: "Commit message for changes to be pushed"
+    required: false
+    default: "${{ github.job }} job pushed changes"
+  file_path:
+    description: "File / Folder to add for commit"
+    required: false
+    default: "."
+
+runs:
+  using: "composite"
+  steps:
+    - name: Commit changes
+      shell: bash
+      run: |
+        # Commit Changes
+        git add "${{ inputs.file_path }}"
+        echo "Changes added successfully to git - ${{ inputs.file_path }}"
+        git diff --quiet && git diff --staged --quiet || git commit -m "${{ inputs.commit_message }}"
+        echo "Changes committed successfully."

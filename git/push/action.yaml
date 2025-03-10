@@ -1,0 +1,20 @@
+name: "Execute git push command"
+description: "Execute git push command to push changes to the repository"
+
+inputs:
+  branch_name:
+    description: "Branch name to push changes to"
+    required: true
+  force_push:
+    description: "Force push changes"
+    required: false
+    default: "true"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Push changes
+      shell: bash
+      run: |
+        git push origin "${{ inputs.branch_name }}" $([[ "${{ inputs.force_push }}" == "true" ]] && echo "--force")
+        echo "Changes pushed successfully."
