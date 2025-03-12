@@ -4,7 +4,8 @@ description: "Execute git push command to push changes to the repository"
 inputs:
   branch_name:
     description: "Branch name to push changes to"
-    required: true
+    required: false
+    default: main
   force_push:
     description: "Force push changes"
     required: false
