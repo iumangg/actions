@@ -2,10 +2,10 @@ name: Calculate & update repo size
 description: Calculate and update the repository size in a YAML file
 
 inputs:
-  repo_sizes_file:
+  repo_size_file:
     description: Path to the file where repo sizes will be stored
     required: false
-    default: .github/repo-sizes.yaml
+    default: .github/repo-size.yaml
 
 runs:
   using: composite
@@ -23,21 +23,21 @@ runs:
         }
 
         # Create or replace repo size data file
-        > ${{ inputs.repo_sizes_file }}
+        > ${{ inputs.repo_size_file }}
 
         # Calculate size of the root directory
-        echo "root: $(du -sh . | format_size)" >> ${{ inputs.repo_sizes_file }}
+        echo "root: $(du -sh . | format_size)" >> ${{ inputs.repo_size_file }}
 
         # Calculate size of each first-level subfolder (sorted)
         find . -mindepth 1 -maxdepth 1 -type d | sort | while read -r dir; do
-          echo "  $(basename "$dir"): $(du -sh "$dir" | format_size)" >> ${{ inputs.repo_sizes_file }}
+          echo "  $(basename "$dir"): $(du -sh "$dir" | format_size)" >> ${{ inputs.repo_size_file }}
 
           # Calculate size of each second-level subfolder (sorted)
           find "$dir" -mindepth 1 -maxdepth 1 -type d | sort | while read -r subdir; do
-            echo "    $(basename "$subdir"): $(du -sh "$subdir" | format_size)" >> ${{ inputs.repo_sizes_file }}
+            echo "    $(basename "$subdir"): $(du -sh "$subdir" | format_size)" >> ${{ inputs.repo_size_file }}
           done
         done
 
     - name: Print the repo sizes data file
       shell: bash
-      run: cat ${{ inputs.repo_sizes_file }}
+      run: cat ${{ inputs.repo_size_file }}
