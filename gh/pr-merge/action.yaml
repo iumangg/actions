@@ -25,7 +25,7 @@ runs:
       run: |
         echo "Review state: ${{ inputs.review_state }}"
         if [[ "${{ inputs.review_state }}" == "approved" ]]; then
-          gh pr merge ${{ inputs.pr_number }} --repo ${{ inputs.repository }} --merge --body "${{ inputs.merge_commit_message }}"
+          gh pr merge ${{ inputs.pr_number }} --repo ${{ inputs.repository }} --merge --subject "${{ inputs.merge_commit_message }}"
           echo "Pull request #${{ inputs.pr_number }} merged successfully."
         else
           echo "Review not approved. Skipping merge."
