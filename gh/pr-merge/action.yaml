@@ -16,7 +16,7 @@ inputs:
   merge_commit_message:
     description: "Commit message for the merge commit"
     required: false
-    default: "pr: merge pull request #${{ inputs.pr_number }} from ${{ github.actor }}/${{ github.event.pull_request.head.ref }}"
+    default: "pr: merge pull request #${{ github.event.pull_request.number }} from ${{ github.actor }}/${{ github.event.pull_request.head.ref }}"
 runs:
   using: "composite"
   steps:
