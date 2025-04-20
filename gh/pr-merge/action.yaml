@@ -1,0 +1,32 @@
+name: "Merge GitHub pull request if approved"
+description: "Merges a pull request if approved in the repository using GitHub CLI"
+inputs:
+  repository:
+    description: "Repository to merge the pull request in"
+    required: false
+    default: "${{ github.repository }}"
+  pr_number:
+    description: "Pull request number to merge"
+    required: false
+    default: "${{ github.event.pull_request.number }}"
+  review_state:
+    description: "Review state to check for approval"
+    required: false
+    default: "${{ github.event.review.state }}"
+  merge_commit_message:
+    description: "Commit message for the merge commit"
+    required: false
+    default: "pr: merge pull request #${{ inputs.pr_number }} from ${{ github.actor }}/${{ github.event.pull_request.head.ref }}"
+runs:
+  using: "composite"
+  steps:
+    - name: Merge Github pull request if approved
+      shell: bash
+      run: |
+        echo "Review state: ${{ inputs.review_state }}"
+        if [[ "${{ inputs.review_state }}" == "approved" ]]; then
+          gh pr merge ${{ inputs.pr_number }} --repo ${{ inputs.repository }} --merge --body "${{ inputs.merge_commit_message }}"
+          echo "Pull request #${{ inputs.pr_number }} merged successfully."
+        else
+          echo "Review not approved. Skipping merge."
+        fi
