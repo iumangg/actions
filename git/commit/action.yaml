@@ -10,15 +10,26 @@ inputs:
     description: "File / Folder to add for commit"
     required: false
     default: "."
+outputs:
+  commit_executed:
+    description: "Indicates whether a commit was executed"
+    value: ${{ steps.commit-changes.outputs.commit_executed }}
 
 runs:
   using: "composite"
   steps:
     - name: Commit changes
+      id: commit-changes
       shell: bash
       run: |
         # Commit Changes
         git add "${{ inputs.file_path }}"
         echo "Changes added successfully to git - ${{ inputs.file_path }}"
-        git diff --quiet && git diff --staged --quiet || git commit -m "${{ inputs.commit_message }}"
-        echo "Changes committed successfully."
+        if git diff --quiet && git diff --staged --quiet; then
+          echo "commit_executed=false" >> $GITHUB_OUTPUT
+          echo "Skipping commit as there are no changes to commit."
+        else
+          git commit -m "${{ inputs.commit_message }}"
+          echo "commit_executed=true" >> $GITHUB_OUTPUT
+          echo "Changes committed successfully."
+        fi
