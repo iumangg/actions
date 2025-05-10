@@ -1,5 +1,5 @@
 name: Configure git
-description: Configures Git user name and email for the repository
+description: Configures Git username and useremail
 
 inputs:
   user_name:
