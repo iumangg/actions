@@ -1,6 +1,11 @@
 name: Test Git Actions
 
 on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - git/**
   workflow_dispatch:
 
 jobs:
