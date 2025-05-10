@@ -1,0 +1,53 @@
+name: Test Git Actions
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-git-configure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Test Git Configure Action with Default Parameters
+        uses: ./git/configure
+
+      - name: Verify Default Git Configuration
+        run: |
+          if [ "$(git config --get user.name)" != "github-actions[bot]" ]; then
+            echo "Error: user.name does not match default value" && exit 1
+          fi
+          if [ "$(git config --get user.email)" != "41898282+github-actions[bot]@users.noreply.github.com" ]; then
+            echo "Error: user.email does not match default value" && exit 1
+          fi
+
+      - name: Test Git Configure Action
+        uses: ./git/configure
+        with:
+          user_name: "Test User"
+          user_email: "test@example.com"
+
+      - name: Verify Git Configuration
+        run: |
+          if [ "$(git config --get user.name)" != "Test User" ]; then
+            echo "Error: user.name does not match expected value" && exit 1
+          fi
+          if [ "$(git config --get user.email)" != "test@example.com" ]; then
+            echo "Error: user.email does not match expected value" && exit 1
+          fi
+
+      - name: Test Git Configure Action with Missing Parameters
+        uses: ./git/configure
+        with:
+          user_name: ""
+          user_email: ""
+
+      - name: Verify Missing Git Configuration
+        run: |
+          if [ "$(git config --get user.name)" != "github-actions[bot]" ]; then
+            echo "Error: user.name is not empty as expected" && exit 1
+          fi
+          if [ "$(git config --get user.email)" != "41898282+github-actions[bot]@users.noreply.github.com" ]; then
+            echo "Error: user.email is not empty as expected" && exit 1
+          fi

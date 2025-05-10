@@ -1,25 +1,39 @@
-name: "Configure git"
-description: "Configures Git user name and email for the repository"
+name: Configure git
+description: Configures Git user name and email for the repository
 
 inputs:
   user_name:
-    description: "Git user name"
+    description: Git user name
     required: true
-    default: "github-actions[bot]"
+    default: github-actions[bot]
   user_email:
-    description: "Git user email"
+    description: Git user email
     required: true
-    default: "41898282+github-actions[bot]@users.noreply.github.com"
+    default: 41898282+github-actions[bot]@users.noreply.github.com
 
 runs:
-  using: "composite"
+  using: composite
   steps:
     - name: Configure git
       shell: bash
       run: |
+        # Check if the user name is empty string
+        if [ -z "${{ inputs.user_name }}" ]; then
+          echo "User name is provided empty string. Using default user name 'github-actions[bot]'."
+          user_name="github-actions[bot]"
+        else
+          user_name="${{ inputs.user_name }}"
+        fi
+        # Check if the user email is empty string
+        if [ -z "${{ inputs.user_email }}" ]; then
+          echo "User email is provided empty string. Using default user email '41898282+github-actions[bot]@users.noreply.github.com'."
+          user_email="41898282+github-actions[bot]@users.noreply.github.com"
+        else
+          user_email="${{ inputs.user_email }}"
+        fi
         # Set Git user name
-        git config --global user.name "${{ inputs.user_name }}"
-        echo "Git user name is set to ${{ inputs.user_name }}"
+        git config --global user.name "$user_name"
+        echo "Git user name is set to $user_name"
         # Set Git user email
-        git config --global user.email "${{ inputs.user_email }}"
-        echo "Git user email is set to ${{ inputs.user_email }}"
+        git config --global user.email "$user_email"
+        echo "Git user email is set to $user_email"
