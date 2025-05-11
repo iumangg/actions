@@ -1,16 +1,24 @@
-name: "Checkout Branch"
-description: "Checkout and switch to a branch"
+name: Checkout Branch
+description: Checkout and switch to a branch in the repository
 
 inputs:
   branch_name:
-    description: "Branch name to checkout and switch to"
+    description: Branch name to checkout and switch to
     required: false
     default: main
 
 runs:
-  using: "composite"
+  using: composite
   steps:
-    - name: "Checkout branch"
+    - name: Checkout branch
       shell: bash
       run: |
-        git checkout -B "${{ inputs.branch_name }}"
+        # Check if the branch name is empty string
+        if [ -z "${{ inputs.branch_name }}" ]; then
+          echo "Branch name is provided empty string. Using default branch 'main'."
+          branch_name="main"
+        else
+          branch_name="${{ inputs.branch_name }}"
+        fi
+        # Checkout the specified branch
+        git checkout -B "$branch_name"

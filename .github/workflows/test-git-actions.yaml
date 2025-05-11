@@ -56,3 +56,41 @@ jobs:
           if [ "$(git config --get user.email)" != "41898282+github-actions[bot]@users.noreply.github.com" ]; then
             echo "Error: user.email is not empty as expected" && exit 1
           fi
+
+  test-git-checkout-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Test Git Checkout Branch Action with Default Parameters
+        uses: ./git/checkout-branch
+
+      - name: Verify Default Branch Checkout
+        run: |
+          if [ "$(git branch --show-current)" != "main" ]; then
+            echo "Error: Current branch is not 'main' as expected" && exit 1
+          fi
+          echo "Default branch checkout verified successfully."
+      - name: Test Git Checkout Branch Action
+        uses: ./git/checkout-branch
+        with:
+          branch_name: "test-branch"
+
+      - name: Verify Branch Checkout
+        run: |
+          if [ "$(git branch --show-current)" != "test-branch" ]; then
+            echo "Error: Current branch is not 'test-branch'" && exit 1
+          fi
+          echo "Branch checkout verified successfully."
+      - name: Test Git Checkout Branch Action with Missing Parameters
+        uses: ./git/checkout-branch
+        with:
+          branch_name: ""
+
+      - name: Verify Missing Branch Checkout
+        run: |
+          if [ "$(git branch --show-current)" != "main" ]; then
+            echo "Error: Current branch is not 'main' as expected" && exit 1
+          fi
+          echo "Missing branch checkout verified successfully."
