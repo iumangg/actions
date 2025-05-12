@@ -1,0 +1,41 @@
+name: Test Repo Size Action
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - repo-size/**
+  workflow_dispatch:
+
+jobs:
+  test-repo-size:
+    name: Test Repo Size Action
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Test with default parameters
+        id: default-test
+        uses: ./repo-size
+
+      - name: Verify default output
+        run: |
+          if [ ! -f .github/repo-size.yaml ]; then
+            echo "Default repo size file not created!" && exit 1;
+          fi
+          echo "Default repo size file created successfully."
+
+      - name: Test with custom repo_size_file
+        id: custom-file-test
+        uses: ./repo-size
+        with:
+          repo_size_file: custom-repo-size.yaml
+
+      - name: Verify custom output
+        run: |
+          if [ ! -f custom-repo-size.yaml ]; then
+            echo "Custom repo size file not created!" && exit 1;
+          fi
+          echo "Custom repo size file created successfully."
