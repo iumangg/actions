@@ -1,6 +1,11 @@
 name: Test Repo Size Action
 
 on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - repo-size/**
   workflow_dispatch:
 
 jobs:
