@@ -72,6 +72,7 @@ jobs:
             echo "Error: Current branch is not 'main' as expected" && exit 1
           fi
           echo "Default branch checkout verified successfully."
+
       - name: Test Git Checkout Branch Action
         uses: ./git/checkout-branch
         with:
@@ -83,6 +84,7 @@ jobs:
             echo "Error: Current branch is not 'test-branch'" && exit 1
           fi
           echo "Branch checkout verified successfully."
+
       - name: Test Git Checkout Branch Action with Missing Parameters
         uses: ./git/checkout-branch
         with:
@@ -94,3 +96,67 @@ jobs:
             echo "Error: Current branch is not 'main' as expected" && exit 1
           fi
           echo "Missing branch checkout verified successfully."
+
+  test-git-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Configure git user for commit
+        uses: ./git/configure
+
+      - name: Prepare for commit test with default parameters
+        run: |
+          # Create test files for commit
+          echo "Test changes" >> test-changes.txt
+
+      - name: Test Git Commit Action with Default Parameters
+        uses: ./git/commit
+
+      - name: Verify Default Commit
+        run: |
+          if [ "$(git log -1 --pretty=%B)" != "${{ github.job }} job pushed changes" ]; then
+            echo "Error: Commit message does not match default value" && exit 1
+          fi
+          echo "Default commit verified successfully."
+
+      - name: Prepare for commit test with file_path parameter
+        run: |
+          # Create test files for commit
+          echo "Test change in path" >> test-file-in-path.txt
+          echo "Test change outside path" >> test-file-outside-path.txt
+
+      - name: Test Git Commit Action with file_path Parameter
+        uses: ./git/commit
+        with:
+          commit_message: "Commit with file_path parameter"
+          file_path: "test-file-in-path.txt"
+
+      - name: Verify Commit with file_path Parameter
+        run: |
+          # Verify the commit message
+          if [ "$(git log -1 --pretty=%B)" != "Commit with file_path parameter" ]; then
+            echo "Error: Commit message does not match expected value" && exit 1
+          fi
+          # Verify the commit includes changes from the specified path
+          if ! git diff-tree --no-commit-id --name-only -r HEAD | grep -q "^test-file-in-path.txt"; then
+            echo "Error: Commit does not include changes from the specified path" && exit 1
+          fi
+          # Verify the commit does not include changes outside the specified path
+          if git diff-tree --no-commit-id --name-only -r HEAD | grep -q "^test-file-outside-path.txt"; then
+          echo "Error: Commit includes changes outside the specified path" && exit 1
+          fi
+          echo "Commit with file_path parameter verified successfully."
+
+      - name: Test Git Commit Action with Custom Commit Message
+        uses: ./git/commit
+        with:
+          commit_message: "Custom commit message for testing"
+
+      - name: Verify Custom Commit Message
+        run: |
+          if [ "$(git log -1 --pretty=%B)" != "Custom commit message for testing" ]; then
+            echo "Error: Commit message does not match expected value" && exit 1
+          fi
+          echo "Custom commit message verified successfully."
