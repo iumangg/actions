@@ -16,7 +16,7 @@ runs:
   steps:
     - name: Configure git
       shell: bash
-      run: git/configure/git-configure.sh
+      run: ${{ github.action_path }}/git-configure.sh
       env:
         user_name: ${{ inputs.user_name }}
         user_email: ${{ inputs.user_email }}
