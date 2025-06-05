@@ -12,13 +12,6 @@ runs:
   steps:
     - name: Checkout branch
       shell: bash
-      run: |
-        # Check if the branch name is empty string
-        if [ -z "${{ inputs.branch_name }}" ]; then
-          echo "Branch name is provided empty string. Using default branch 'main'."
-          branch_name="main"
-        else
-          branch_name="${{ inputs.branch_name }}"
-        fi
-        # Checkout the specified branch
-        git checkout -B "$branch_name"
+      run: ${{ github.action_path }}/git-checkout-branch.sh
+      env:
+        branch_name: ${{ inputs.branch_name }}
