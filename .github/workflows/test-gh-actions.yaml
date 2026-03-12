@@ -1,0 +1,63 @@
+name: Test gh Actions
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - gh/**
+  workflow_dispatch:
+
+jobs:
+  test-pr-merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create mock gh script and add to PATH
+        run: |
+          mkdir -p $HOME/.local/bin
+          echo '#!/bin/bash' > $HOME/.local/bin/gh
+          echo 'echo "$@" > /tmp/gh_mock_output' >> $HOME/.local/bin/gh
+          chmod +x $HOME/.local/bin/gh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Test gh pr-merge action (approved)
+        uses: ./gh/pr-merge
+        with:
+          review_state: "approved"
+          pr_number: "123"
+          repository: "${{ github.repository }}"
+          merge_commit_message: "test: merge gh pull request"
+
+      - name: Verify gh mock call (approved)
+        run: |
+          expected_output="pr merge 123 --repo ${{ github.repository }} --merge --subject test: merge gh pull request"
+          actual_output=$(cat /tmp/gh_mock_output)
+          if [ "$actual_output" != "$expected_output" ]; then
+            echo "Verification failed for 'approved' case!"
+            echo "Expected: $expected_output"
+            echo "Got: $actual_output"
+            exit 1
+          fi
+          echo "Verification successful for 'approved' case!"
+          rm /tmp/gh_mock_output
+
+      - name: Test gh pr-merge action (not approved)
+        uses: ./gh/pr-merge
+        with:
+          review_state: "changes_requested"
+          pr_number: "456"
+          repository: "${{ github.repository }}"
+          merge_commit_message: "test: merge gh pull request"
+
+      - name: Verify mock call (not approved)
+        run: |
+          if [ -f /tmp/gh_mock_output ]; then
+            echo "Verification failed for 'not approved' case! The gh command should not have been called."
+            echo "File /tmp/gh_mock_output exists. Content:"
+            cat /tmp/gh_mock_output
+            exit 1
+          fi
+          echo "Verification successful for 'not approved' case!"
