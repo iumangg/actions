@@ -22,11 +22,9 @@ runs:
   steps:
     - name: Merge Github pull request if approved
       shell: bash
-      run: |
-        echo "Review state: ${{ inputs.review_state }}"
-        if [[ "${{ inputs.review_state }}" == "approved" ]]; then
-          gh pr merge ${{ inputs.pr_number }} --repo ${{ inputs.repository }} --merge --subject "${{ inputs.merge_commit_message }}"
-          echo "Pull request #${{ inputs.pr_number }} merged successfully."
-        else
-          echo "Review not approved. Skipping merge."
-        fi
+      run: ${{ github.action_path }}/gh-pr-merge.sh
+      env:
+        repository: ${{ inputs.repository }}
+        pr_number: ${{ inputs.pr_number }}
+        review_state: ${{ inputs.review_state }}
+        merge_commit_message: ${{ inputs.merge_commit_message }}
