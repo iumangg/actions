@@ -1,0 +1,18 @@
+{
+  "name": "actions",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/dhoeric/features/act:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "github.vscode-github-actions",
+        "esbenp.prettier-vscode",
+        "github.github-vscode-theme",
+        "vscode-icons-team.vscode-icons"
+      ]
+    }
+  }
+}
